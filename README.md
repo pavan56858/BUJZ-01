@@ -134,6 +134,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📧 Contact
 
-Your Name - [@yourtwitter](https://twitter.com/yourtwitter)
+Your Name - Pavan Kumar
 
-Project Link: [https://github.com/yourusername/bujji-ai-chatbot](https://github.com/yourusername/bujji-ai-chatbot) 
+Project Link: https://bujz-01.onrender.com
