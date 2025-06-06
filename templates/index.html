@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bujji - Your AI Companion</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        .robot-icon {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 20px;
+            position: relative;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .robot-sphere {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+        }
+
+        .robot-sphere img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .robot-eyes, .eye, .robot-base {
+            display: none;
+        }
+
+        h1 {
+            color: white;
+            font-size: 3rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .subtitle {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.2rem;
+            font-weight: 300;
+            margin-bottom: 20px;
+        }
+
+        .chat-container {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 35px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            animation: fadeInUp 0.8s ease-out 0.3s both;
+            min-height: 70vh;
+        }
+
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 25px;
+            padding-right: 10px;
+            min-height: 400px;
+        }
+
+        .message {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            animation: messageSlide 0.5s ease-out;
+        }
+
+        .message.user {
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin: 0 15px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .bot-avatar {
+            background: linear-gradient(145deg, #4a90e2, #357abd);
+            box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .bot-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .user-avatar {
+            background: linear-gradient(145deg, #667eea, #764ba2);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            color: white;
+            font-weight: bold;
+        }
+
+        .bot-eye {
+            display: none;
+        }
+
+        .message-content {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 15px 20px;
+            border-radius: 20px;
+            max-width: 70%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .message.user .message-content {
+            background: linear-gradient(145deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .message-text {
+            color: white;
+            line-height: 1.5;
+            font-size: 1rem;
+        }
+
+        .input-container {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 25px;
+            padding: 15px 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .mic-button {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(145deg, #4a90e2, #357abd);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .mic-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 16px rgba(74, 144, 226, 0.4);
+        }
+
+        .mic-icon {
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            position: relative;
+        }
+
+        .mic-icon::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 6px;
+            background: white;
+        }
+
+        .message-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: white;
+            font-size: 1rem;
+            padding: 10px 0;
+        }
+
+        .message-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .send-button {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(145deg, #00d4ff, #0099cc);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 16px rgba(0, 212, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .send-button:hover {
+            transform: scale(1.1) rotate(15deg);
+            box-shadow: 0 8px 20px rgba(0, 212, 255, 0.4);
+        }
+
+        .send-icon {
+            width: 0;
+            height: 0;
+            border-left: 12px solid white;
+            border-top: 8px solid transparent;
+            border-bottom: 8px solid transparent;
+            margin-left: 3px;
+        }
+
+        .typing-indicator {
+            display: none;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+            margin-left: 15px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+                height: 100vh;
+            }
+
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            .subtitle {
+                font-size: 1rem;
+            }
+
+            .robot-icon {
+                width: 60px;
+                height: 60px;
+            }
+
+            .robot-sphere {
+                width: 60px;
+                height: 60px;
+            }
+
+            .chat-container {
+                padding: 20px;
+                border-radius: 15px;
+            }
+
+            .message-content {
+                max-width: 85%;
+                padding: 12px 16px;
+            }
+
+            .message-avatar {
+                width: 35px;
+                height: 35px;
+                margin: 0 10px;
+            }
+
+            .input-container {
+                padding: 12px 16px;
+            }
+
+            .header {
+                margin-bottom: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .robot-icon {
+                width: 50px;
+                height: 50px;
+            }
+
+            .robot-sphere {
+                width: 50px;
+                height: 50px;
+            }
+
+            .eye {
+                width: 8px;
+                height: 8px;
+            }
+
+            .chat-container {
+                padding: 15px;
+            }
+
+            .message-content {
+                max-width: 90%;
+                padding: 10px 14px;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes blink {
+            0%, 90%, 100% { opacity: 1; }
+            95% { opacity: 0.3; }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes messageSlide {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+                opacity: 0.4;
+            }
+            30% {
+                transform: translateY(-10px);
+                opacity: 1;
+            }
+        }
+
+        .messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .messages::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+
+        .messages::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+        }
+
+        .messages::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="robot-icon" id="robotIcon" style="cursor: pointer;">
+                <div class="robot-sphere">
+                    <img src="https://res.cloudinary.com/dcoijn5mh/image/upload/v1749112445/ChatGPT_Image_Jun_5_2025_02_03_38_PM_ubpz9l.png" alt="Bujji Robot" />
+                </div>
+            </div>
+            <h1>BUJJI</h1>
+            <p class="subtitle">Your AI Companion</p>
+        </div>
+
+        <div class="chat-container">
+            <div class="messages" id="messages">
+                <div class="message">
+                    <div class="message-avatar bot-avatar">
+                        <img src="https://res.cloudinary.com/dcoijn5mh/image/upload/v1749112445/ChatGPT_Image_Jun_5_2025_02_03_38_PM_ubpz9l.png" alt="Bujji" />
+                    </div>
+                    <div class="message-content">
+                        <div class="message-text">Hi, I'm Bujji.</div>
+                    </div>
+                </div>
+                <div class="message">
+                    <div class="message-avatar bot-avatar">
+                        <img src="https://res.cloudinary.com/dcoijn5mh/image/upload/v1749112445/ChatGPT_Image_Jun_5_2025_02_03_38_PM_ubpz9l.png" alt="Bujji" />
+                    </div>
+                    <div class="message-content">
+                        <div class="message-text">How can I assist you today?</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="typing-indicator" id="typingIndicator">
+                <div class="message-avatar bot-avatar">
+                    <img src="https://res.cloudinary.com/dcoijn5mh/image/upload/v1749112445/ChatGPT_Image_Jun_5_2025_02_03_38_PM_ubpz9l.png" alt="Bujji" />
+                </div>
+                <div class="typing-dots">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            </div>
+
+            <div class="input-container">
+                <button class="mic-button" id="micButton" title="Voice input">
+                    <div class="mic-icon"></div>
+                </button>
+                <input type="text" class="message-input" id="messageInput" placeholder="Ask Bujji anything..." />
+                <button class="send-button" id="sendButton" title="Send message">
+                    <div class="send-icon"></div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const messagesContainer = document.getElementById('messages');
+        const messageInput = document.getElementById('messageInput');
+        const sendButton = document.getElementById('sendButton');
+        const micButton = document.getElementById('micButton');
+        const typingIndicator = document.getElementById('typingIndicator');
+        const robotIcon = document.getElementById('robotIcon');
+
+        // User identification and storage
+        let currentUserId = localStorage.getItem('userId');
+        if (!currentUserId) {
+            currentUserId = 'user_' + Date.now();
+            localStorage.setItem('userId', currentUserId);
+        }
+
+        // Add click handler for robot icon
+        robotIcon.addEventListener('click', () => {
+            // Clear chat history from localStorage
+            localStorage.removeItem(`chat_history_${currentUserId}`);
+            // Reload the page
+            window.location.reload();
+        });
+
+        // Load chat history for current user
+        function loadChatHistory() {
+            const history = JSON.parse(localStorage.getItem(`chat_history_${currentUserId}`) || '[]');
+            messagesContainer.innerHTML = ''; // Clear initial messages
+            
+            if (history.length === 0) {
+                // Add welcome messages for new users
+                addMessage("Hi, I'm Bujji.", false);
+                addMessage("How can I assist you today?", false);
+            } else {
+                // Load existing chat history
+                history.forEach(msg => {
+                    addMessage(msg.text, msg.isUser);
+                });
+            }
+        }
+
+        // Save message to chat history
+        function saveMessage(text, isUser) {
+            const history = JSON.parse(localStorage.getItem(`chat_history_${currentUserId}`) || '[]');
+            history.push({ text, isUser, timestamp: Date.now() });
+            localStorage.setItem(`chat_history_${currentUserId}`, JSON.stringify(history));
+        }
+
+        function createMessage(text, isUser = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user' : ''}`;
+            
+            const avatar = document.createElement('div');
+            avatar.className = `message-avatar ${isUser ? 'user-avatar' : 'bot-avatar'}`;
+            
+            if (isUser) {
+                avatar.textContent = 'U';
+            } else {
+                const img = document.createElement('img');
+                img.src = "https://res.cloudinary.com/dcoijn5mh/image/upload/v1749112445/ChatGPT_Image_Jun_5_2025_02_03_38_PM_ubpz9l.png";
+                img.alt = "Bujji";
+                avatar.appendChild(img);
+            }
+            
+            const content = document.createElement('div');
+            content.className = 'message-content';
+            
+            const messageText = document.createElement('div');
+            messageText.className = 'message-text';
+            messageText.textContent = text;
+            
+            content.appendChild(messageText);
+            messageDiv.appendChild(avatar);
+            messageDiv.appendChild(content);
+            
+            return messageDiv;
+        }
+
+        function addMessage(text, isUser = false) {
+            const messageElement = createMessage(text, isUser);
+            messagesContainer.appendChild(messageElement);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            saveMessage(text, isUser);
+        }
+
+        function showTypingIndicator() {
+            typingIndicator.style.display = 'flex';
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function hideTypingIndicator() {
+            typingIndicator.style.display = 'none';
+        }
+
+        async function sendMessage() {
+            const message = messageInput.value.trim();
+            if (message) {
+                // Add user message to chat
+                addMessage(message, true);
+                messageInput.value = '';
+                
+                // Show typing indicator
+                showTypingIndicator();
+                
+                try {
+                    // Send message to backend
+                    const response = await fetch('/chat', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ 
+                            message: message,
+                            userId: currentUserId 
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    // Hide typing indicator
+                    hideTypingIndicator();
+                    
+                    // Add Bujji's response
+                    addMessage(data.response);
+                } catch (error) {
+                    console.error('Error:', error);
+                    hideTypingIndicator();
+                    addMessage('Sorry, I encountered an error. Please try again.');
+                }
+            }
+        }
+
+        // Event listeners
+        sendButton.addEventListener('click', sendMessage);
+
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        micButton.addEventListener('click', () => {
+            // Voice input placeholder - would integrate with Web Speech API
+            messageInput.placeholder = 'Listening... (Feature coming soon)';
+            setTimeout(() => {
+                messageInput.placeholder = 'Ask Bujji anything...';
+            }, 2000);
+        });
+
+        // Load chat history when page loads
+        loadChatHistory();
+
+        // Auto-focus input on load
+        messageInput.focus();
+
+        // Smooth scrolling for messages
+        function smoothScrollToBottom() {
+            messagesContainer.scrollTo({
+                top: messagesContainer.scrollHeight,
+                behavior: 'smooth'
+            });
+        }
+
+        // Handle input focus for mobile
+        messageInput.addEventListener('focus', () => {
+            setTimeout(() => {
+                smoothScrollToBottom();
+            }, 300);
+        });
+    </script>
+</body>
+</html>
