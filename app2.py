@@ -12,7 +12,7 @@ app = Flask(__name__)
 # ============================
 
 # 1.1 Gemini API Key
-GENIE_API_KEY = os.getenv("GENIE_API_KEY", "AIzaSyCpHajVsiSzUpv8Gwsdmkx8m8uknt9TNWg")
+GENIE_API_KEY = os.getenv("GENIE_API_KEY")
 genai.configure(api_key=GENIE_API_KEY)
 
 # 1.2 Memory Directory for User Chat Histories
@@ -247,3 +247,4 @@ if __name__ == "__main__":
     # Set the port from environment variable or default to 5000
     port = int(os.environ.get("PORT", 5050))
     app.run(host='0.0.0.0', port=port)
+
