@@ -96,24 +96,6 @@ bujji-ai-chatbot/
   }
   ```
 
-## 🚀 Deployment
-
-### Local Development
-```bash
-python app2.py
-```
-
-### Vercel Deployment
-1. Install Vercel CLI:
-```bash
-npm install -g vercel
-```
-
-2. Deploy:
-```bash
-vercel
-```
-
 ## 🤝 Contributing
 
 1. Fork the repository
@@ -134,3 +116,4 @@ vercel
 Your Name - Pavan Kumar
 
 Project Link: https://bujz-01.onrender.com
+
